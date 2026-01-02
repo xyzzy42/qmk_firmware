@@ -176,6 +176,51 @@ ifneq ($(findstring RP2040, $(MCU)),)
   FIRMWARE_FORMAT ?= uf2
 endif
 
+ifneq ($(findstring RP2350, $(MCU)),)
+  # Cortex version
+  MCU = cortex-m33
+
+  # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7, M33 is 8
+  CHIBIOS_PORT = ARMv8-M-ML
+
+  ## chip/board settings
+  # - the next two should match the directories in
+  #   <chibios>/os/hal/ports/$(MCU_FAMILY)/$(MCU_SERIES)
+  MCU_FAMILY = RP
+  MCU_SERIES = RP2350
+
+  # Platform makefile: Use ChibiOS's platform.mk directly (not chibios-contrib)
+  # to avoid pulling in the incomplete USBDv2 driver. QMK's RP2350.mk adds USBDv1.
+  PLATFORM_MK = $(TOP_DIR)/lib/chibios/os/hal/ports/RP/RP2350/platform.mk
+
+  # Linker script to use
+  # - it should exist in <chibios>/os/common/startup/ARMCMx/compilers/GCC/ld/
+  MCU_LDSCRIPT ?= RP2350_FLASH
+
+  # Startup code to use
+  #  - it should exist in <chibios>/os/common/startup/ARMCMx/compilers/GCC/mk/
+  MCU_STARTUP ?= rp2350
+
+  # Board: it should exist either in <chibios>/os/hal/boards/,
+  # <keyboard_dir>/boards/, or drivers/boards/
+  BOARD ?= GENERIC_RP_RP2350
+
+  # RP2350 Cortex-M33 has FPv5-SP-D16 FPU - use softfp ABI
+  USE_FPU ?= yes
+  USE_FPU_OPT ?= -mfloat-abi=softfp -mfpu=fpv5-sp-d16 -fsingle-precision-constant
+
+  # Default UF2 Bootloader settings
+  UF2_FAMILY ?= RP2350
+  FIRMWARE_FORMAT ?= uf2
+
+  # UF2 conversion using picotool instead of uf2conv.py
+  # picotool properly handles RP2350 ELF files with imagedef blocks
+  # The build rule passes: <tmp_file> --output <uf2_file> --convert --family <family>
+  # We ignore these args and use picotool to convert the ELF directly
+  UF2CONV = sh -c 'picotool uf2 convert $$(BUILD_DIR)/$$(TARGET).elf "$$$$3"' picotool
+  UF2CONV_ARGS =
+endif
+
 ifneq ($(findstring STM32F042, $(MCU)),)
   # Cortex version
   MCU = cortex-m0
