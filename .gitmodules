@@ -1,11 +1,11 @@
 [submodule "lib/chibios"]
 	path = lib/chibios
-	url = https://github.com/qmk/ChibiOS
-	branch = master
+	url = https://github.com/emolitor/ChibiOS
+	branch = em-no-pico-sdk
 [submodule "lib/chibios-contrib"]
 	path = lib/chibios-contrib
-	url = https://github.com/qmk/ChibiOS-Contrib
-	branch = master
+	url = https://github.com/emolitor/ChibiOS-Contrib
+	branch = em-no-pico-sdk
 [submodule "lib/googletest"]
 	path = lib/googletest
 	url = https://github.com/qmk/googletest

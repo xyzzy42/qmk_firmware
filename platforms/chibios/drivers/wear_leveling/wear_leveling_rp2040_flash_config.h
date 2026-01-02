@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#ifndef __ASSEMBLER__
-#    include "hardware/flash.h"
+// Define FLASH_SECTOR_SIZE directly to avoid including Pico SDK headers
+// which conflict with ChibiOS (both define REG_ALIAS_*_BITS macros)
+#ifndef FLASH_SECTOR_SIZE
+#    define FLASH_SECTOR_SIZE 4096
 #endif
 
 // 2-byte writes

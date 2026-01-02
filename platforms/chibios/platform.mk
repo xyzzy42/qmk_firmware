@@ -279,7 +279,7 @@ PLATFORM_SRC = \
         $(PLATFORMSRC) \
         $(BOARDSRC) \
         $(STREAMSSRC) \
-        $(CHIBIOS)/os/various/syscalls.c \
+        $(CHIBIOS)/os/various/newlib_bindings/syscalls.c \
         $(PLATFORM_COMMON_DIR)/syscall-fallbacks.c \
         $(PLATFORM_COMMON_DIR)/wait.c \
         $(PLATFORM_COMMON_DIR)/synchronization_util.c \
@@ -296,7 +296,8 @@ EXTRAINCDIRS += $(CHIBIOS)/os/license \
          $(HALCONFDIR) $(CHCONFDIR) \
          $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) $(OSLIBINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
-         $(STREAMSINC) $(CHIBIOS)/os/various $(COMMON_VPATH)
+         $(STREAMSINC) $(CHIBIOS)/os/various $(COMMON_VPATH) \
+         $(ALLINC)
 
 #
 # QMK specific MCU family support selection.

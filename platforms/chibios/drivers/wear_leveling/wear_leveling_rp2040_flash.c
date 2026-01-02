@@ -8,6 +8,10 @@
 
 #include <stdbool.h>
 
+// Undefine macros that conflict between ChibiOS and Pico SDK
+#undef REG_ALIAS_XOR_BITS
+#undef REG_ALIAS_SET_BITS
+#undef REG_ALIAS_CLR_BITS
 #include "pico/bootrom.h"
 #include "hardware/flash.h"
 #include "hardware/sync.h"
@@ -28,7 +32,8 @@
 #define FLASHCMD_READ_STATUS 0x05
 #define FLASHCMD_WRITE_ENABLE 0x06
 
-extern const uint8_t BOOT2_ROM[256];
+// Use linker-defined boot2 symbol from ChibiOS instead of QMK's stage2_bootloaders.c
+extern const uint8_t __boot2_start__[];
 static uint32_t      BOOT2_ROM_RAM[64];
 
 static ssi_hw_t *const ssi = (ssi_hw_t *)XIP_SSI_BASE;
@@ -164,7 +169,7 @@ static int interrupts;
 
 bool backing_store_init(void) {
     bs_dprintf("Init\n");
-    memcpy(BOOT2_ROM_RAM, BOOT2_ROM, sizeof(BOOT2_ROM));
+    memcpy(BOOT2_ROM_RAM, __boot2_start__, 256);
     __compiler_memory_barrier();
     return true;
 }

@@ -5,6 +5,11 @@
 #include "bootloader.h"
 #include "gpio.h"
 #include "wait.h"
+
+// Undefine macros that conflict between ChibiOS and Pico SDK
+#undef REG_ALIAS_XOR_BITS
+#undef REG_ALIAS_SET_BITS
+#undef REG_ALIAS_CLR_BITS
 #include "pico/bootrom.h"
 
 #if !defined(RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED)
@@ -39,7 +44,7 @@ const uint32_t                                                              magi
 void __late_init(void) {
     // All clocks have to be enabled before jumping to the bootloader function,
     // otherwise the bootrom will be stuck infinitely.
-    clocks_init();
+    rp_clock_init();
 
     if (magic_location != magic_token) {
         magic_location = magic_token;

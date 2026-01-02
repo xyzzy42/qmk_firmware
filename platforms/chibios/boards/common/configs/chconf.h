@@ -29,7 +29,7 @@
 #define CHCONF_H
 
 #define _CHIBIOS_RT_CONF_
-#define _CHIBIOS_RT_CONF_VER_7_0_
+#define _CHIBIOS_RT_CONF_VER_8_0_
 
 /*===========================================================================*/
 /**
@@ -825,9 +825,20 @@
  * @brief   Runtime Faults Collection Unit hook.
  * @details This hook is invoked each time new faults are collected and stored.
  */
-#define CH_CFG_RUNTIME_FAULTS_HOOK(mask) {                                  \
+#define CH_CFG_RUNTIME_FAULTS_HOOK(mask) do {                               \
   /* Faults handling code here.*/                                           \
-}
+} while (false)
+
+/**
+ * @brief   Safety check hook.
+ * @details This hook is invoked when a safety check fails.
+ *
+ * @param[in] l         safety check level
+ * @param[in] func      function name string
+ */
+#define CH_CFG_SAFETY_CHECK_HOOK(l, func) do {                              \
+  /* Safety check code here.*/                                              \
+} while (false)
 
 /** @} */
 

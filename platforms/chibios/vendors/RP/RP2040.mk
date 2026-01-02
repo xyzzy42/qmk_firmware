@@ -18,37 +18,32 @@ CFLAGS += -DPICO_NO_FPGA_CHECK \
           -DNDEBUG
 
 #
-# Pico SDK source and header files needed by QMK and ChibiOS
+# Pico SDK source and header files needed by QMK
+# Note: ChibiOS 8.0+ provides native RP2040 support including:
+# - Clock initialization (rp_clocks.c) - no longer need hardware_clocks
+# - PLL control (rp_pll.c) - no longer need hardware_pll
+# - XOSC control (rp_xosc.c) - no longer need hardware_xosc
+# - GPIO via HAL - no longer need hardware_gpio
+# - Timer support - no longer need hardware_timer
+# - Watchdog via HAL - no longer need hardware_watchdog
+# - Boot stage 2 (bs2_default_padded_checksummed.S)
+#
+# Minimal Pico SDK needed for flash operations (wear leveling) and bootloader:
 ##############################################################################
 PICOSDKROOT   := $(TOP_DIR)/lib/pico-sdk
 
-PICOSDKSRC     = $(PICOSDKROOT)/src/rp2_common/hardware_clocks/clocks.c \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_pll/pll.c \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_pio/pio.c \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_timer/timer.c \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_flash/flash.c \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_gpio/gpio.c \
+PICOSDKSRC     = $(PICOSDKROOT)/src/rp2_common/hardware_flash/flash.c \
                  $(PICOSDKROOT)/src/rp2_common/hardware_claim/claim.c \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_watchdog/watchdog.c \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_xosc/xosc.c \
                  $(PICOSDKROOT)/src/rp2_common/pico_bootrom/bootrom.c
 
-PICOSDKINC     = $(CHIBIOS)//os/various/pico_bindings/dumb/include \
+PICOSDKINC     = $(CHIBIOS)/os/various/pico_bindings/dumb/include \
                  $(PICOSDKROOT)/src/common/pico_base/include \
                  $(PICOSDKROOT)/src/rp2_common/pico_platform/include \
                  $(PICOSDKROOT)/src/rp2_common/hardware_base/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_clocks/include \
                  $(PICOSDKROOT)/src/rp2_common/hardware_claim/include \
                  $(PICOSDKROOT)/src/rp2_common/hardware_flash/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_gpio/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_irq/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_pll/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_pio/include \
                  $(PICOSDKROOT)/src/rp2_common/hardware_sync/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_timer/include \
                  $(PICOSDKROOT)/src/rp2_common/hardware_resets/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_watchdog/include \
-                 $(PICOSDKROOT)/src/rp2_common/hardware_xosc/include \
                  $(PICOSDKROOT)/src/rp2040/hardware_regs/include \
                  $(PICOSDKROOT)/src/rp2040/hardware_structs/include \
                  $(PICOSDKROOT)/src/boards/include \
@@ -59,8 +54,8 @@ EXTRAINCDIRS += $(PICOSDKINC)
 
 PLATFORM_RP2040_PATH := $(PLATFORM_PATH)/$(PLATFORM_KEY)/vendors/$(MCU_FAMILY)
 
-PLATFORM_SRC +=	$(PLATFORM_RP2040_PATH)/stage2_bootloaders.c \
-				$(PLATFORM_RP2040_PATH)/pico_sdk_shims.c
+# Note: stage2_bootloaders.c removed - ChibiOS provides boot2 (bs2_default_padded_checksummed.S)
+PLATFORM_SRC +=	$(PLATFORM_RP2040_PATH)/pico_sdk_shims.c
 
 EXTRAINCDIRS += $(PLATFORM_RP2040_PATH)
 
