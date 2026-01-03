@@ -210,15 +210,8 @@ ifneq ($(findstring RP2350, $(MCU)),)
   USE_FPU_OPT ?= -mfloat-abi=softfp -mfpu=fpv5-sp-d16 -fsingle-precision-constant
 
   # Default UF2 Bootloader settings
-  UF2_FAMILY ?= RP2350
+  UF2_FAMILY ?= RP2350_ARM_S
   FIRMWARE_FORMAT ?= uf2
-
-  # UF2 conversion using picotool instead of uf2conv.py
-  # picotool properly handles RP2350 ELF files with imagedef blocks
-  # The build rule passes: <tmp_file> --output <uf2_file> --convert --family <family>
-  # We ignore these args and use picotool to convert the ELF directly
-  UF2CONV = sh -c 'picotool uf2 convert $$(BUILD_DIR)/$$(TARGET).elf "$$$$3"' picotool
-  UF2CONV_ARGS =
 endif
 
 ifneq ($(findstring STM32F042, $(MCU)),)

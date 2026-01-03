@@ -262,6 +262,9 @@ endif
 
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
+
+# Ensure hal_safety.c is included (required for ChibiOS 8.0+)
+HALSRC += $(CHIBIOS)/os/hal/src/hal_safety.c
 include $(CHIBIOS)/os/oslib/oslib.mk
 include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
 # RTOS files (optional).
