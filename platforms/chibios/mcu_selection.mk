@@ -189,9 +189,9 @@ ifneq ($(findstring RP2350, $(MCU)),)
   MCU_FAMILY = RP
   MCU_SERIES = RP2350
 
-  # Platform makefile: Use ChibiOS's platform.mk directly (not chibios-contrib)
-  # to avoid pulling in the incomplete USBDv2 driver. QMK's RP2350.mk adds USBDv1.
-  PLATFORM_MK = $(TOP_DIR)/lib/chibios/os/hal/ports/RP/RP2350/platform.mk
+  # Platform makefile: Use ChibiOS's platform_arm.mk directly (not chibios-contrib)
+  # QMK's RP2350.mk adds the USBDv1 driver from chibios-contrib.
+  PLATFORM_MK = $(TOP_DIR)/lib/chibios/os/hal/ports/RP/RP2350/platform_arm.mk
 
   # Linker script to use
   # - it should exist in <chibios>/os/common/startup/ARMCMx/compilers/GCC/ld/
