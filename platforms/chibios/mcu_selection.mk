@@ -156,6 +156,11 @@ ifneq ($(findstring RP2040, $(MCU)),)
   MCU_FAMILY = RP
   MCU_SERIES = RP2040
 
+  # Platform makefile: Use ChibiOS trunk directly (not chibios-contrib)
+  # to avoid pulling in duplicate ADC/USB drivers. QMK's RP2040.mk adds
+  # I2C and PWM from contrib separately.
+  PLATFORM_MK = $(TOP_DIR)/lib/chibios/os/hal/ports/RP/RP2040/platform.mk
+
   # Linker script to use
   # - it should exist either in <chibios>/os/common/ports/ARMCMx/compilers/GCC/ld/
   #   or <keyboard_dir>/ld/

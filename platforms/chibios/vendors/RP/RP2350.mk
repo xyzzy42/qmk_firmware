@@ -28,35 +28,18 @@ ADEFS    += -DCORTEX_SIMPLIFIED_PRIORITY=TRUE -DCH_DBG_ENABLE_STACK_CHECK=TRUE
 OPT_DEFS += -DCRT0_CPACR_INIT=0x00F0C000
 ADEFS    += -DCRT0_CPACR_INIT=0x00F0C000
 
-CFLAGS += -DPICO_NO_FPGA_CHECK \
-          -DNDEBUG \
+CFLAGS += -DNDEBUG \
           -Wno-error=discarded-qualifiers \
           -Wno-error=array-bounds
 
 #
-# ChibiOS provides native RP2350 HAL drivers (clocks, pll, xosc, gpio)
-# and pico_bindings for minimal Pico SDK API compatibility
+# ChibiOS-Contrib drivers not yet in trunk: I2C and PWM
 ##############################################################################
-EXTRAINCDIRS += $(CHIBIOS)/os/various/pico_bindings/dumb/include
+PLATFORM_SRC += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/I2Cv1/hal_i2c_lld.c
+EXTRAINCDIRS += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/I2Cv1
 
-#
-# USB driver from chibios-contrib (required for keyboard operation)
-# USBDv1 works for both RP2040 and RP2350 since they have the same USB controller.
-# The rp2040_usb.h header provides hardware register definitions.
-##############################################################################
-PLATFORM_SRC += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/USBDv1/hal_usb_lld.c
-EXTRAINCDIRS += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/USBDv1
-
-#
-# RP2350 does not require Pico SDK - ChibiOS provides all necessary drivers
-# Flash operations use ChibiOS HAL or bootrom direct access
-##############################################################################
+PLATFORM_SRC += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/PWMv1/hal_pwm_lld.c
+EXTRAINCDIRS += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/PWMv1
 
 PLATFORM_RP2350_PATH := $(PLATFORM_PATH)/$(PLATFORM_KEY)/vendors/$(MCU_FAMILY)
-
-PLATFORM_SRC += $(PLATFORM_RP2350_PATH)/pico_sdk_shims.c
-
-# ChibiOS 8.0 hal_safety.c is included via hal.mk (non-smart build includes it)
-# so we don't need to add it here explicitly
-
 EXTRAINCDIRS += $(PLATFORM_RP2350_PATH)

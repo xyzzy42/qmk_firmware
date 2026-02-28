@@ -33,6 +33,8 @@ static inline uint32_t detect_flash_size(void) {
     return FLASH_BANK_SIZE;
 #elif defined(FLASH_SIZE)
     return FLASH_SIZE;
+#elif defined(RP_FLASH_SIZE)
+    return RP_FLASH_SIZE;
 #elif defined(FLASHSIZE_BASE)
 #    if defined(QMK_MCU_SERIES_STM32F0XX) || defined(QMK_MCU_SERIES_STM32F1XX) || defined(QMK_MCU_SERIES_STM32F3XX) || defined(QMK_MCU_SERIES_STM32F4XX) || defined(QMK_MCU_SERIES_STM32G4XX) || defined(QMK_MCU_SERIES_STM32L0XX) || defined(QMK_MCU_SERIES_STM32L4XX) || defined(QMK_MCU_SERIES_AT32F415) || defined(QMK_MCU_SERIES_GD32VF103)
     return ((*(uint32_t *)FLASHSIZE_BASE) & 0xFFFFU) << 10U; // this register has the flash size in kB, so we convert it to bytes
