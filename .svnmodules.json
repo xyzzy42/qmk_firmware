@@ -1,0 +1,6 @@
+{
+    "lib/chibios": {
+        "url": "https://svn.code.sf.net/p/chibios/code/trunk",
+        "revision": null
+    }
+}
