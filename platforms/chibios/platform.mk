@@ -59,7 +59,7 @@ else
 
     # Port files. Try a few different locations, for compability with old versions and
     # for things hardware in the contrib repository
-    PORT_V = $(CHIBIOS)/os/common/ports/$(CHIBIOS_PORT)/compilers/GCC/mk/port.mk
+    PORT_V ?= $(CHIBIOS)/os/common/ports/$(CHIBIOS_PORT)/compilers/GCC/mk/port.mk
     ifeq ("$(wildcard $(PORT_V))","")
         PORT_V = $(CHIBIOS)/os/rt/ports/ARMCMx/compilers/GCC/mk/port_v$(ARMV)m.mk
         ifeq ("$(wildcard $(PORT_V))","")

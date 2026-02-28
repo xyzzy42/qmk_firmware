@@ -8,6 +8,7 @@ from milc import cli
 from milc.questions import yesno
 
 from qmk import submodules
+from qmk import svnmodules
 from qmk.constants import QMK_FIRMWARE, QMK_FIRMWARE_UPSTREAM, QMK_USERSPACE, HAS_QMK_USERSPACE
 from .check import CheckStatus, check_binaries, check_binary_versions, check_submodules
 from qmk.git import git_check_repo, git_get_branch, git_get_tag, git_get_last_log_entry, git_get_common_ancestor, git_is_dirty, git_get_remotes, git_check_deviation
@@ -145,6 +146,16 @@ def output_submodule_status():
             else:
                 cli.log.error(f'- {sub_name}: <<< missing or unknown >>>')
 
+    # SVN checkout status
+    svn_status = svnmodules.status()
+    for name, info in svn_status.items():
+        if info['status'] is True:
+            cli.log.info(f'- {name}: SVN r{info["revision"]}')
+        elif info['status'] is False:
+            cli.log.warning(f'- {name}: SVN checkout out of date (r{info["revision"]})')
+        else:
+            cli.log.error(f'- {name}: <<< SVN checkout missing >>>')
+
 
 def userspace_tests(qmk_firmware):
     if qmk_firmware:
@@ -217,6 +228,7 @@ def doctor(cli):
     else:
         if git_check_repo() and yesno('Would you like to clone the submodules?', default=True):
             submodules.update()
+            svnmodules.update()
             sub_ok = check_submodules()
 
         if sub_ok == CheckStatus.ERROR:

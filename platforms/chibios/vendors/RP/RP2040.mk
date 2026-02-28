@@ -17,13 +17,6 @@ ADEFS  += -DCRT0_VTOR_INIT=1 \
 CFLAGS += -DNDEBUG
 
 #
-# ChibiOS-Contrib drivers not yet in trunk: I2C and PWM
+# Shared ChibiOS-Contrib drivers (I2C, PWM, ADC) and vendor includes
 ##############################################################################
-PLATFORM_SRC += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/I2Cv1/hal_i2c_lld.c
-EXTRAINCDIRS += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/I2Cv1
-
-PLATFORM_SRC += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/PWMv1/hal_pwm_lld.c
-EXTRAINCDIRS += $(CHIBIOS_CONTRIB)/os/hal/ports/RP/LLD/PWMv1
-
-PLATFORM_RP2040_PATH := $(PLATFORM_PATH)/$(PLATFORM_KEY)/vendors/$(MCU_FAMILY)
-EXTRAINCDIRS += $(PLATFORM_RP2040_PATH)
+include $(PLATFORM_PATH)/$(PLATFORM_KEY)/vendors/$(MCU_FAMILY)/_common.mk

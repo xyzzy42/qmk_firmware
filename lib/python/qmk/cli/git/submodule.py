@@ -4,6 +4,7 @@ from pathlib import Path
 from milc import cli
 
 from qmk import submodules
+from qmk import svnmodules
 
 REMOVE_DIRS = [
     'lib/ugfx',
@@ -12,6 +13,7 @@ REMOVE_DIRS = [
 
 IGNORE_DIRS = [
     'lib/arm_atsam',
+    'lib/chibios',
     'lib/fnv',
     'lib/lib8tion',
     'lib/python',
@@ -27,13 +29,19 @@ def git_submodule(cli):
     """Git Submodule actions
     """
     if cli.args.check:
-        return all(item['status'] for item in submodules.status().values())
+        git_ok = all(item['status'] for item in submodules.status().values())
+        svn_ok = all(item['status'] for item in svnmodules.status().values())
+        return git_ok and svn_ok
 
     if cli.args.sync:
         cli.run(['git', 'submodule', 'sync', '--recursive'])
         for name, item in submodules.status().items():
             if item['status'] is None:
                 cli.run(['git', 'submodule', 'update', '--depth=50', '--init', name], capture_output=False)
+        # Sync SVN checkouts
+        missing_svn = [name for name, item in svnmodules.status().items() if item['status'] is None]
+        if missing_svn:
+            svnmodules.update(missing_svn)
         return True
 
     # can be the default behavior with: qmk config git_submodule.force=True
@@ -51,3 +59,6 @@ def git_submodule(cli):
 
     cli.run(['git', 'submodule', 'sync', '--recursive'], capture_output=False)
     cli.run(['git', 'submodule', 'update', '--init', '--recursive', '--progress'], capture_output=False)
+
+    # Update SVN checkouts
+    svnmodules.update()

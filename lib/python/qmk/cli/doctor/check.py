@@ -8,6 +8,7 @@ from pathlib import Path
 
 from milc import cli
 from qmk import submodules
+from qmk import svnmodules
 from qmk.commands import find_make
 
 
@@ -237,6 +238,18 @@ def check_submodules():
             return CheckStatus.ERROR
         elif not submodule['status']:
             return CheckStatus.WARNING
+
+    # Check SVN checkouts
+    svn_config = svnmodules._load_config()
+    if svn_config:
+        if not svnmodules.is_svn_available():
+            cli.log.error('{fg_red}SVN checkouts are configured but svn is not installed.')
+            return CheckStatus.ERROR
+        for checkout in svnmodules.status().values():
+            if checkout['status'] is None:
+                return CheckStatus.ERROR
+            elif not checkout['status']:
+                return CheckStatus.WARNING
 
     return CheckStatus.OK
 

@@ -113,6 +113,9 @@ __pycache__
 .python-version
 .venv
 
+# ChibiOS SVN checkout (not a git submodule)
+lib/chibios/
+
 # Prerequisites for updating ChibiOS
 /util/fmpp*
 

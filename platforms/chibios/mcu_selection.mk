@@ -146,7 +146,11 @@ ifneq ($(findstring RP2040, $(MCU)),)
   MCU = cortex-m0plus
 
   # ARM version, CORTEX-M0/M1 are 6, CORTEX-M3/M4/M7 are 7
-  CHIBIOS_PORT = ARMv6-M-RP2
+  CHIBIOS_PORT = ARMv6-M
+
+  # Use the SMP-enabled port makefile (port_rp2.mk) instead of the default
+  # port.mk, since the RP2040 board's chconf.h has CH_CFG_SMP_MODE = TRUE.
+  PORT_V = $(CHIBIOS)/os/common/ports/ARMv6-M/compilers/GCC/mk/port_rp2.mk
 
   ## chip/board settings
   # - the next two should match the directories in
@@ -194,9 +198,9 @@ ifneq ($(findstring RP2350, $(MCU)),)
   MCU_FAMILY = RP
   MCU_SERIES = RP2350
 
-  # Platform makefile: Use ChibiOS's platform_arm.mk directly (not chibios-contrib)
+  # Platform makefile: Use ChibiOS's platform.mk directly (not chibios-contrib)
   # QMK's RP2350.mk adds the USBDv1 driver from chibios-contrib.
-  PLATFORM_MK = $(TOP_DIR)/lib/chibios/os/hal/ports/RP/RP2350/platform_arm.mk
+  PLATFORM_MK = $(TOP_DIR)/lib/chibios/os/hal/ports/RP/RP2350/platform.mk
 
   # Linker script to use
   # - it should exist in <chibios>/os/common/startup/ARMCMx/compilers/GCC/ld/
