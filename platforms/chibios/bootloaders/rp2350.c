@@ -6,41 +6,36 @@
 #include "gpio.h"
 #include "wait.h"
 
-#if !defined(RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED)
-#    define RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED_MASK 0U
+#if defined(RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED)
+#    define BOOTLOADER_FLAGS    RP_ROM_BOOTSEL_GPIO_PIN_SPECIFIED
+#    define BOOTLOADER_LED      RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED
 #else
-#    define RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED_MASK (1U << RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED)
+#    define BOOTLOADER_FLAGS    0
+#    define BOOTLOADER_LED      0 /* not used */
 #endif
 
-// RP2350 bootrom functions
-// These are accessed via the bootrom lookup table
-typedef void (*reset_usb_boot_fn)(uint32_t gpio_activity_pin_mask, uint32_t disable_interface_mask);
+// RP2350 bootrom lookup function
+typedef void *(*rom_table_lookup_fn)(uint32_t code, uint32_t mask);
+// This function is looked up via the above function
+typedef void (*reboot_fn)(uint32_t flags, uint32_t delay_ms, uint32_t p0, uint32_t p1);
 
 // RP2350 ROM table addresses - the ROM stores a pointer to the function table at this address
 #define RP2350_ROM_TABLE_LOOKUP_ADDR 0x00000014
+// The ROM stores a pointer here to a function that looks up pointers the above table
+#define RP2350_ROM_TABLE_LOOKUP_FUNC 0x00000016
 
-// Helper to read a value from a fixed ROM address, avoiding compiler warnings
-static inline uint32_t rom_read32(uint32_t addr) {
-    uint32_t result;
-    __asm__ volatile ("ldr %0, [%1]" : "=r" (result) : "r" (addr));
-    return result;
-}
+static reboot_fn get_reset_usb_boot(void) {
+    // GCC doesn't know the ROM table exists, so flags this as an out of bounds array access
+    _Pragma("GCC diagnostic push");
+    _Pragma("GCC diagnostic ignored \"-Warray-bounds\"");
+    uint16_t lookup_func_addr = *(const uint16_t *)RP2350_ROM_TABLE_LOOKUP_FUNC;
+    _Pragma("GCC diagnostic pop");
 
-static reset_usb_boot_fn get_reset_usb_boot(void) {
-    // RP2350 bootrom function table lookup
-    // The bootrom functions are at fixed addresses in the RP2350
-    // Function code for reset_usb_boot is 'UB' (0x5542)
-    uint32_t table_addr = rom_read32(RP2350_ROM_TABLE_LOOKUP_ADDR);
-    uint16_t *lookup = (uint16_t *)table_addr;
+    // RP2350 bootrom function lookup
+    rom_table_lookup_fn lookup = (const void *)(uintptr_t)lookup_func_addr;
 
-    // Search for the function
-    while (*lookup != 0) {
-        if (*lookup == 0x5542) {  // 'UB' = USB boot
-            return (reset_usb_boot_fn)(*(uint32_t *)(lookup + 1));
-        }
-        lookup += 3;  // Each entry is 6 bytes
-    }
-    return NULL;
+    // Gets reboot function or returns NULL on error
+    return lookup(RP_ROM_FUNC_REBOOT, RP_ROM_RT_FLAG_FUNC_ARM_NONSEC);
 }
 
 __attribute__((weak)) void mcu_reset(void) {
@@ -48,9 +43,9 @@ __attribute__((weak)) void mcu_reset(void) {
 }
 
 void bootloader_jump(void) {
-    reset_usb_boot_fn reset_usb_boot = get_reset_usb_boot();
+    reboot_fn reset_usb_boot = get_reset_usb_boot();
     if (reset_usb_boot) {
-        reset_usb_boot(RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED_MASK, 0U);
+        reset_usb_boot(RP_ROM_REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL | RP_ROM_REBOOT2_FLAG_NO_RETURN_ON_SUCCESS, 0, BOOTLOADER_FLAGS, BOOTLOADER_LED);
     }
     // If we can't find the function, fall back to system reset
     NVIC_SystemReset();
@@ -99,9 +94,10 @@ void __late_init(void) {
     }
 
     magic_location = 0;
-    reset_usb_boot_fn reset_usb_boot = get_reset_usb_boot();
+
+    reboot_fn reset_usb_boot = get_reset_usb_boot();
     if (reset_usb_boot) {
-        reset_usb_boot(RP2350_BOOTLOADER_DOUBLE_TAP_RESET_LED_MASK, 0U);
+        reset_usb_boot(RP_ROM_REBOOT2_FLAG_REBOOT_TYPE_BOOTSEL, 0, BOOTLOADER_FLAGS, BOOTLOADER_LED);
     }
 }
 
