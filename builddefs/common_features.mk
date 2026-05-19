@@ -1021,7 +1021,7 @@ endif
 
 ifeq ($(strip $(UART_DRIVER_REQUIRED)), yes)
     ifeq ($(strip $(PLATFORM)), CHIBIOS)
-        ifneq ($(filter $(MCU_SERIES),RP2040),)
+        ifneq ($(filter $(MCU_SERIES),RP2040 RP2350),)
             OPT_DEFS += -DHAL_USE_SIO=TRUE
             QUANTUM_LIB_SRC += uart_sio.c
         else
